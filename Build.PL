@@ -74,4 +74,5 @@ $class->new(
         'Probe::Perl' => 0,
         'Test::More' => 0.45,   # thread-safe
     },
+    script_files => [ 'scripts/ptee' ],
 )->create_build_script;
