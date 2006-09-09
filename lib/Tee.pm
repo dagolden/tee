@@ -23,8 +23,7 @@ my $to_devnull = " > " . File::Spec->devnull . " 2>&1";
 for my $path ( split($p->config('path_sep'), $ENV{PATH}) ) {
     my $try_ptee = File::Spec->catfile( $path, PTEE );
     next unless -r $try_ptee;
-    if ( -x $try_ptee || 
-         system("$try_ptee -V $to_devnull" ) == 0 ) {
+    if ( system("$try_ptee -V $to_devnull" ) == 0 ) {
         $ptee_cmd = $try_ptee;
         last;
     }

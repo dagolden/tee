@@ -13,7 +13,6 @@ WriteMakefile
                            'Test::More' => '0.45',
                            'Getopt::Long' => '2.32',
                            'Probe::Perl' => 0,
-                           'Pod::Usage' => 0,
                            'File::Spec' => 0,
                            'IPC::Run3' => '0.035',
                            'File::Basename' => 0

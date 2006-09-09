@@ -62,7 +62,7 @@ $class->new(
     module_name         => 'Tee',
     dist_author         => 'David A. Golden <dagolden@cpan.org>',
     license             => 'perl',
-    create_readme       => 0,
+    create_readme       => 1,
     create_makefile_pl  => 'traditional',
     requires        => {
         # module requirements here
@@ -70,7 +70,6 @@ $class->new(
         'File::Spec' => 0,
         'Getopt::Long' => 2.32,
         'IPC::Run3' => 0.035,
-        'Pod::Usage' => 0,
         'Probe::Perl' => 0,
         'Test::More' => 0.45,   # thread-safe
     },

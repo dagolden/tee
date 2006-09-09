@@ -1,10 +1,13 @@
 Build.PL
 Changes
+INSTALL
 lib/Tee.pm
 lib/Tee.pod
 LICENSE
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+META.yml
 README
 scripts/ptee
 t/01_Tee.t
@@ -15,5 +18,3 @@ t/99_pod-coverage.t
 t/Expected.pm
 t/helloworld.pl
 Todo
-Makefile.PL
-META.yml

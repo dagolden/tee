@@ -1,15 +1,19 @@
-#!perl
+#!/usr/bin/perl
+
 # ptee -- perl implementation of unix tee
 $VERSION = '0.10';
 use strict;
 use File::Basename qw/basename/;
 use Getopt::Long;
 use IO::File;
-use Pod::Usage qw/pod2usage/;
 
 =head1 NAME
 
 ptee - emulate the GNU tee program with Perl
+
+=cut
+
+my $help_text = <<'=cut';
 
 =head1 SYNOPSIS
 
@@ -27,6 +31,8 @@ ptee - emulate the GNU tee program with Perl
         print the version number of this program
 
 =cut
+
+$help_text =~ s/\A.+?( ptee.*)/$1/ms;
 
 #--------------------------------------------------------------------------#
 # process command line
@@ -49,8 +55,8 @@ if ($opts{version}) {
 }
 
 if ($opts{help}) {
-    pod2usage(1);
-    exit;
+    print "Usage:\n$help_text";
+    exit 1;
 }
 
 my $mode = $opts{append} ? ">>" : ">";
