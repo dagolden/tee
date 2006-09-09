@@ -5,7 +5,9 @@ WriteMakefile
           'PL_FILES' => {},
           'INSTALLDIRS' => 'site',
           'NAME' => 'Tee',
-          'EXE_FILES' => [],
+          'EXE_FILES' => [
+                           'scripts/ptee'
+                         ],
           'VERSION_FROM' => 'lib/Tee.pm',
           'PREREQ_PM' => {
                            'Test::More' => '0.45',
