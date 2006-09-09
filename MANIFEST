@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Tee.pm
+lib/Tee.pod
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+scripts/ptee
+t/01_Tee.t
+t/02_tee_script.t
+t/helloworld.pl
+t/pod-coverage.t
+t/pod.t
+Todo

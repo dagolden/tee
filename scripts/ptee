@@ -1,0 +1,24 @@
+#!perl
+# ptee -- perl implementation of unix tee
+$VERSION = '0.01';
+use strict;
+use warnings;
+
+my $buffer_size = 1024;
+my $buffer;
+
+my $file = shift;
+
+if ($file eq "-V") {
+    print "$0 $main::VERSION\n";
+    exit 0;
+}
+
+open FILE, "> $file";
+
+while ( sysread( STDIN, $buffer, $buffer_size ) > 0 ) {
+    syswrite STDOUT, $buffer;
+    syswrite FILE, $buffer;
+}
+
+close FILE;

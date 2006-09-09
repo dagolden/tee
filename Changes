@@ -1,0 +1,4 @@
+Revision history for Perl module Tee
+
+0.01 Tue Aug  1 19:40:07 2006
+    - original skeleton created with ExtUtils::ModuleMaker::TT

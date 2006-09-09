@@ -1,0 +1,5 @@
+TODO list for Perl module Tee
+
+- Add command line option processing like unix tee (or as near as possible);
+  Must add Getopt::Long to ptee (sigh)
+
