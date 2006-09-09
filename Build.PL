@@ -72,7 +72,6 @@ $class->new(
         'IPC::Run3' => 0.035,
         'Pod::Usage' => 0,
         'Probe::Perl' => 0,
-        'Scalar::Util' => 1.09, # refaddr
         'Test::More' => 0.45,   # thread-safe
     },
 )->create_build_script;
