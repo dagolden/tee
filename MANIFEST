@@ -1,3 +1,4 @@
+Build.bat
 Build.PL
 Changes
 lib/Tee.pm
@@ -9,7 +10,9 @@ README
 scripts/ptee
 t/01_Tee.t
 t/02_tee_script.t
+t/03_tee_function.t
+t/98_pod.t
+t/99_pod-coverage.t
+t/Expected.pm
 t/helloworld.pl
-t/pod-coverage.t
-t/pod.t
 Todo

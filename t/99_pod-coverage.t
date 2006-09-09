@@ -1,5 +1,11 @@
 use Test::More;
+use Probe::Perl;
 plan skip_all => "Skipping author tests" if not $ENV{AUTHOR_TESTING};
+
+my $p = Probe::Perl->new;
+
+$ENV{PATH} = join( $p->config('path_sep'), 'scripts', 
+                   split( $p->config('path_sep'), $ENV{PATH} ) );
 
 my $min_tpc = 1.08;
 eval "use Test::Pod::Coverage $min_tpc";

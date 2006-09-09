@@ -66,7 +66,11 @@ $class->new(
     create_makefile_pl  => 'traditional',
     requires        => {
         # module requirements here
+        'File::Basename' => 0,
+        'File::Spec' => 0,
+        'Getopt::Long' => 2.32,
         'IPC::Run3' => 0.035,
+        'Pod::Usage' => 0,
         'Probe::Perl' => 0,
         'Scalar::Util' => 1.09, # refaddr
         'Test::More' => 0.45,   # thread-safe

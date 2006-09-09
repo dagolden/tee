@@ -27,7 +27,7 @@ my $hello = File::Spec->catfile(qw/t helloworld.pl/);
 my $tee = File::Spec->catfile(qw/scripts ptee/);
 my $tempfh = File::Temp->new;
 my $tempname = $tempfh->filename;
-my $got;
+my ($got_stdout, $got_stderr);
 
 $ENV{PATH} = join( $path_sep, 'scripts', split( $path_sep, $ENV{PATH} ) );
 
@@ -35,7 +35,7 @@ $ENV{PATH} = join( $path_sep, 'scripts', split( $path_sep, $ENV{PATH} ) );
 # Begin test plan
 #--------------------------------------------------------------------------#
 
-plan tests =>  6 ;
+plan tests =>  7 ;
 
 require_ok( "Tee" );
 Tee->import;
@@ -48,9 +48,9 @@ ok( -r $hello,
 
 # check direct output of helloworld
 
-run3 "$perl $hello", undef, \$got;
+run3 "$perl $hello", undef, \$got_stdout, \$got_stderr;
 
-is( $got, expected("STDOUT"), 
+is( $got_stdout, expected("STDOUT"), 
     "hello world program output (direct)"
 );
 
@@ -59,10 +59,10 @@ truncate $tempfh, 0;
 tee("$perl $hello", $tempname);
 
 open FH, "< $tempname";
-$got = do { local $/; <FH> };
+$got_stdout = do { local $/; <FH> };
 close FH;
 
-is( $got, expected("STDOUT"), 
+is( $got_stdout, expected("STDOUT"), 
     "hello world program output (tee file)"
 );
 
@@ -71,10 +71,20 @@ truncate $tempfh, 0;
 tee("$perl $hello", { stderr => 1 }, $tempname);
 
 open FH, "< $tempname";
-$got = do { local $/; <FH> };
+$got_stdout = do { local $/; <FH> };
 close FH;
 
-is( $got, expected("STDOUT") . expected("STDERR"), 
+is( $got_stdout, expected("STDOUT") . expected("STDERR"), 
     "hello world program output (tee file with stderr)"
 );
 
+# check tee of both with append
+tee("$perl $hello", { stderr => 1, append => 1 }, $tempname);
+
+open FH, "< $tempname";
+$got_stdout = do { local $/; <FH> };
+close FH;
+
+is( $got_stdout, (expected("STDOUT") . expected("STDERR")) x 2, 
+    "hello world program output (tee file with stderr and append)"
+);
