@@ -86,7 +86,7 @@ $class->new(
     dist_author         => 'David A. Golden <dagolden@cpan.org>',
     license             => 'perl',
     create_readme       => 1,
-    create_makefile_pl  => 'traditional',
+#    create_makefile_pl  => 'traditional',
     requires        => {
         # module requirements here
         'File::Basename' => 0,

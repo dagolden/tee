@@ -27,6 +27,10 @@ my $to_devnull = " > " . File::Spec->devnull . " 2>&1";
 for my $path ( @INC ) {
     my $try_ptee = File::Spec->catfile( $path, 'auto', 'Tee', PTEE );
     next unless -r $try_ptee;
+    if ( $try_ptee =~ /\s/ ) {
+        # protect with quotes
+        $try_ptee =~ s{(.*)}{"$1"}ms;
+    }
     if ( system("$try_ptee -V $to_devnull" ) == 0 ) {
         $ptee_cmd = $try_ptee;
         last;

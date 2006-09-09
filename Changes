@@ -1,5 +1,9 @@
 Revision history for Perl module Tee
 
+0.13
+    - customize Makefile.PL for auto/Tee
+    - handle spaces in ptee path in Tee.pm
+
 0.12 Thu Aug 17 07:40:23 EDT 2006
     - store a copy of ptee in auto/Tee for tee()
     - removed unused test files
