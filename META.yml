@@ -1,6 +1,6 @@
 ---
 name: Tee
-version: 0.11
+version: 0.12
 author:
   - 'David A. Golden <dagolden@cpan.org>'
 abstract: Pure Perl emulation of GNU tee
@@ -11,13 +11,13 @@ requires:
   File::Basename: 0
   File::Spec: 0
   Getopt::Long: 2.32
-  IPC::Run3: 0.035
+  IPC::Run3: 0.033
   Probe::Perl: 0
   Test::More: 0.45
 provides:
   Tee:
     file: lib/Tee.pm
-    version: 0.11
+    version: 0.12
 generated_by: Module::Build version 0.2804
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

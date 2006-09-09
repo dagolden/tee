@@ -6,9 +6,9 @@ my $class = Module::Build->subclass(
     class => "Module::Build::WikiDoc",
     code => <<'SUBCLASS', );
 
-    sub ACTION_build {
+    sub ACTION_code {
         my $self = shift;
-        $self->SUPER::ACTION_build;
+        $self->SUPER::ACTION_code;
         $self->depends_on('share');
     }
 

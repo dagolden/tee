@@ -14,7 +14,7 @@ WriteMakefile
                            'Getopt::Long' => '2.32',
                            'Probe::Perl' => 0,
                            'File::Spec' => 0,
-                           'IPC::Run3' => '0.035',
+                           'IPC::Run3' => '0.033',
                            'File::Basename' => 0
                          }
         )
