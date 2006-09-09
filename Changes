@@ -1,5 +1,9 @@
 Revision history for Perl module Tee
 
+0.11
+    - added multiple file support to tee() to match documentation
+    - Pod addition and cleanups
+
 0.10 Wed Aug  2 22:20:22 EDT 2006
     - initial release
 

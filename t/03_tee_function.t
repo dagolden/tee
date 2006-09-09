@@ -26,6 +26,7 @@ my $path_sep = $pp->config("path_sep");
 my $hello = File::Spec->catfile(qw/t helloworld.pl/);
 my $tee = File::Spec->catfile(qw/scripts ptee/);
 my $tempfh = File::Temp->new;
+my $tempfh2 = File::Temp->new;
 my $tempname = $tempfh->filename;
 my ($got_stdout, $got_stderr);
 
@@ -35,7 +36,7 @@ $ENV{PATH} = join( $path_sep, 'scripts', split( $path_sep, $ENV{PATH} ) );
 # Begin test plan
 #--------------------------------------------------------------------------#
 
-plan tests =>  7 ;
+plan tests =>  9 ;
 
 require_ok( "Tee" );
 Tee->import;
@@ -64,6 +65,26 @@ close FH;
 
 is( $got_stdout, expected("STDOUT"), 
     "hello world program output (tee file)"
+);
+
+# check tee of STDOUT to multiple files
+truncate $tempfh, 0;
+tee("$perl $hello", $tempname, $tempfh2);
+
+open FH, "< $tempname";
+$got_stdout = do { local $/; <FH> };
+close FH;
+
+is( $got_stdout, expected("STDOUT"), 
+    "hello world program output (tee file1 file2 [1])"
+);
+
+open FH, "< $tempfh2";
+$got_stdout = do { local $/; <FH> };
+close FH;
+
+is( $got_stdout, expected("STDOUT"), 
+    "hello world program output (tee file1 file2 [2])"
 );
 
 # check tee of both STDOUT and STDERR

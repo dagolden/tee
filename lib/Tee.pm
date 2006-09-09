@@ -1,6 +1,6 @@
 package Tee;
 
-$VERSION     = "0.10";
+$VERSION     = "0.11";
 @ISA         = qw (Exporter);
 @EXPORT      = qw (tee);
 
@@ -43,10 +43,10 @@ sub tee {
     my $command = shift;
     my $options;
     $options = shift if (ref $_[0] eq 'HASH');
-    my $file = shift;
+    my $files = join(" ", @_);
     my $redirect = $options->{stderr} ? " 2>&1 " : q{};
     my $append = $options->{append} ? " -a " : q{};
-    system( "$command $redirect | $ptee_cmd $append $file" );
+    system( "$command $redirect | $ptee_cmd $append $files" );
 }
 
 1; # modules must be true
@@ -117,13 +117,14 @@ same time.
 
 * [ptee]
 * IPC::Run3
+* IO::Tee
 
 = BUGS
 
 Please report any bugs or feature using the CPAN Request Tracker.  
-Bugs can be submitted by email to C<bug-Tee@rt.cpan.org> or 
+Bugs can be submitted by email to {bug-Tee@rt.cpan.org} or 
 through the web interface at 
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Tee>
+[http://rt.cpan.org/Public/Dist/Display.html?Name=Tee]
 
 When submitting a bug or request, please include a test-file or a patch to an
 existing test-file that illustrates the bug or desired feature.
