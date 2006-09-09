@@ -13,8 +13,11 @@ scripts/ptee
 t/01_Tee.t
 t/02_tee_script.t
 t/03_tee_function.t
+t/04_exit-codes.t
 t/98_pod.t
 t/99_pod-coverage.t
 t/Expected.pm
+t/fail.pl
 t/helloworld.pl
+t/succeed.pl
 Todo
