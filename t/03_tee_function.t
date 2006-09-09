@@ -22,15 +22,12 @@ $|=1;
 
 my $pp = Probe::Perl->new;
 my $perl = $pp->find_perl_interpreter;
-my $path_sep = $pp->config("path_sep");
 my $hello = File::Spec->catfile(qw/t helloworld.pl/);
 my $tee = File::Spec->catfile(qw/scripts ptee/);
 my $tempfh = File::Temp->new;
 my $tempfh2 = File::Temp->new;
 my $tempname = $tempfh->filename;
 my ($got_stdout, $got_stderr);
-
-$ENV{PATH} = join( $path_sep, 'scripts', split( $path_sep, $ENV{PATH} ) );
 
 #--------------------------------------------------------------------------#
 # Begin test plan

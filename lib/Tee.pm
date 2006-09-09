@@ -1,6 +1,6 @@
 package Tee;
 
-$VERSION     = "0.11";
+$VERSION     = "0.12";
 @ISA         = qw (Exporter);
 @EXPORT      = qw (tee);
 
@@ -20,8 +20,12 @@ my $p = Probe::Perl->new;
 my $perl = $p->find_perl_interpreter;
 my $ptee_cmd;
 my $to_devnull = " > " . File::Spec->devnull . " 2>&1";
-for my $path ( split($p->config('path_sep'), $ENV{PATH}) ) {
-    my $try_ptee = File::Spec->catfile( $path, PTEE );
+
+# On installation, we store a copy of ptee in auto/Tee so we're sure
+# to find it later without worrying about $ENV{PATH}
+
+for my $path ( @INC ) {
+    my $try_ptee = File::Spec->catfile( $path, 'auto', 'Tee', PTEE );
     next unless -r $try_ptee;
     if ( system("$try_ptee -V $to_devnull" ) == 0 ) {
         $ptee_cmd = $try_ptee;
@@ -33,13 +37,12 @@ for my $path ( split($p->config('path_sep'), $ENV{PATH}) ) {
     }
 }
 
-die "Couldn't find a working " . PTEE . "\n" unless $ptee_cmd;
-
 #--------------------------------------------------------------------------#
 # Functions
 #--------------------------------------------------------------------------#
 
 sub tee {
+    die "Couldn't find a working " . PTEE . "\n" unless $ptee_cmd;
     my $command = shift;
     my $options;
     $options = shift if (ref $_[0] eq 'HASH');
@@ -61,6 +64,10 @@ __END__
 = NAME
 
 Tee - Pure Perl emulation of GNU tee
+
+= VERSION
+
+This documentation refers to version %%VERSION%%
 
 = SYNOPSIS
 

@@ -6,6 +6,10 @@
 
 Tee - Pure Perl emulation of GNU tee
 
+=head1 VERSION
+
+This documentation refers to version 0.12
+
 =head1 SYNOPSIS
 
   # from Perl

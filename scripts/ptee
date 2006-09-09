@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # ptee -- perl implementation of unix tee
-$VERSION = '0.11';
+$VERSION = '0.12';
 use strict;
 use File::Basename qw/basename/;
 use Getopt::Long;

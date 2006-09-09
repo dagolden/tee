@@ -6,6 +6,29 @@ my $class = Module::Build->subclass(
     class => "Module::Build::WikiDoc",
     code => <<'SUBCLASS', );
 
+    sub ACTION_build {
+        my $self = shift;
+        $self->SUPER::ACTION_build;
+        $self->depends_on('share');
+    }
+
+    sub ACTION_share {
+        my $self = shift;
+        my $blib = $self->blib;
+        my @dist_names = split "/-/", $self->dist_name;
+        my $autodir = File::Spec->catdir($blib, 'lib', 'auto', @dist_names); 
+        File::Path::mkpath( $autodir );
+        for my $f ( @{ $self->rscan_dir( 'scripts', '.' ) } ) {
+            next if $f eq 'scripts';
+            my $to = File::Spec->abs2rel( $f, 'scripts' );
+            $self->copy_if_modified(
+                from => $f, 
+                to => File::Spec->catfile( $autodir, $to ),
+                verbose => 1
+            );
+        }
+    }
+    
     sub ACTION_wikidoc {
         my $self = shift;
         eval "use Pod::WikiDoc";
@@ -69,7 +92,7 @@ $class->new(
         'File::Basename' => 0,
         'File::Spec' => 0,
         'Getopt::Long' => 2.32,
-        'IPC::Run3' => 0.035,
+        'IPC::Run3' => 0.033,
         'Probe::Perl' => 0,
         'Test::More' => 0.45,   # thread-safe
     },

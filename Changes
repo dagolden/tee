@@ -1,5 +1,10 @@
 Revision history for Perl module Tee
 
+0.12
+    - store a copy of ptee in auto/Tee for tee()
+    - removed unused test files
+    - downgraded IPC::Run3 prereq version to 0.033
+
 0.11 Thu Aug  3 14:49:31 EDT 2006
     - added multiple file support to tee() to match documentation
     - Pod addition and cleanups
