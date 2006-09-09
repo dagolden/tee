@@ -25,7 +25,9 @@ package MY;
 sub postamble {
 
 return <<'HERE';
-pm_to_blib :: scripts/ptee
+pure_all :: $(INST_AUTODIR)/ptee
+
+$(INST_AUTODIR)/ptee: scripts/ptee
 	$(CP) scripts/ptee $(INST_AUTODIR)/ptee
 
 HERE

@@ -1,6 +1,6 @@
 package Tee;
 
-$VERSION     = "0.12";
+$VERSION     = "0.13";
 @ISA         = qw (Exporter);
 @EXPORT      = qw (tee);
 

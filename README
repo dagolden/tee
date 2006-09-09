@@ -2,7 +2,7 @@ NAME
     Tee - Pure Perl emulation of GNU tee
 
 VERSION
-    This documentation refers to version 0.12
+    This documentation refers to version 0.13
 
 SYNOPSIS
       # from Perl
