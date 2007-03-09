@@ -7,6 +7,8 @@ $VERSION     = "0.13";
 use strict;
 use Exporter ();
 use File::Spec;
+use IO::File;
+use IO::Handle;
 use Probe::Perl;
 # use warnings; # only for Perl >= 5.6
 
@@ -46,14 +48,38 @@ for my $path ( @INC ) {
 #--------------------------------------------------------------------------#
 
 sub tee {
-    die "Couldn't find a working " . PTEE . "\n" unless $ptee_cmd;
+#    die "Couldn't find a working " . PTEE . "\n" unless $ptee_cmd;
     my $command = shift;
     my $options;
     $options = shift if (ref $_[0] eq 'HASH');
-    my $files = join(" ", @_);
+
+    my $mode = $options->{append} ? ">>" : ">";
     my $redirect = $options->{stderr} ? " 2>&1 " : q{};
-    my $append = $options->{append} ? " -a " : q{};
-    system( "$command $redirect | $ptee_cmd $append $files" );
+
+#    my $stdout = IO::Handle->new->fdopen(fileno(STDOUT),"w");
+    my @files;
+    for my $file ( @_ ) {
+        my $f = IO::File->new("$mode $file") 
+            or die "Could't open '$file' for writing: $!'";
+        push @files, $f;
+    }
+
+    local *COMMAND_FH;
+    open COMMAND_FH, "$command $redirect |" or die;
+    my $buffer;
+    my $buffer_size = 1024;
+    while ( sysread( COMMAND_FH, $buffer, $buffer_size ) > 0 ) {
+        for my $fh ( *STDOUT, @files ) {
+            syswrite $fh, $buffer;
+        }
+    }
+    
+    my $exit = close COMMAND_FH; # to get $?
+    my $status = $?;
+    
+    close for @files;
+
+    return ($exit, $status)
 }
 
 1; # modules must be true

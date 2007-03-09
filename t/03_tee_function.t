@@ -23,17 +23,18 @@ $|=1;
 my $pp = Probe::Perl->new;
 my $perl = $pp->find_perl_interpreter;
 my $hello = File::Spec->catfile(qw/t helloworld.pl/);
+my $fatality = File::Spec->catfile(qw/t fatality.pl/);
 my $tee = File::Spec->catfile(qw/scripts ptee/);
 my $tempfh = File::Temp->new;
 my $tempfh2 = File::Temp->new;
 my $tempname = $tempfh->filename;
-my ($got_stdout, $got_stderr);
+my ($got_stdout, $got_stderr, $rc, $status);
 
 #--------------------------------------------------------------------------#
 # Begin test plan
 #--------------------------------------------------------------------------#
 
-plan tests =>  9 ;
+plan tests =>  14 ;
 
 require_ok( "Tee" );
 Tee->import;
@@ -54,7 +55,16 @@ is( $got_stdout, expected("STDOUT"),
 
 # check tee of STDOUT
 truncate $tempfh, 0;
-tee("$perl $hello", $tempname);
+$rc = tee("$perl $hello", $tempname);
+$status = $? >> 8;
+
+is( $rc, 1,
+    "tee returns 1 on successful execution"
+);
+
+is( $status, 0,
+    "\$? >> 8 is 0 on successful execution"
+);
 
 open FH, "< $tempname";
 $got_stdout = do { local $/; <FH> };
@@ -106,3 +116,25 @@ close FH;
 is( $got_stdout, (expected("STDOUT") . expected("STDERR")) x 2, 
     "hello world program output (tee file with stderr and append)"
 );
+
+# check tee with fatal error code
+truncate $tempfh, 0;
+$rc = tee("$perl $fatality", { stderr => 1 }, $tempname);
+$status = $? >> 8;
+
+is( $rc, 0,
+    "teeing fatal script returns 0"
+);
+
+is( $status, 1,
+    "\$? >> 8 is 1 on successful execution"
+);
+
+open FH, "< $tempname";
+$got_stdout = do { local $/; <FH> };
+close FH;
+
+is( $got_stdout, expected("STDOUT") . expected("STDERR"), 
+    "hello world program output (tee file with stderr)"
+);
+
