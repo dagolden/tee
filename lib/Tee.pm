@@ -12,36 +12,36 @@ use IO::Handle;
 use Probe::Perl;
 # use warnings; # only for Perl >= 5.6
 
-use constant PTEE => "ptee";
+#use constant PTEE => "ptee";
 
 #--------------------------------------------------------------------------#
 # Platform independent ptee invocation
 #--------------------------------------------------------------------------#
 
-my $p = Probe::Perl->new;
-my $perl = $p->find_perl_interpreter;
-my $ptee_cmd;
-my $to_devnull = " > " . File::Spec->devnull . " 2>&1";
-
-# On installation, we store a copy of ptee in auto/Tee so we're sure
-# to find it later without worrying about $ENV{PATH}
-
-for my $path ( @INC ) {
-    my $try_ptee = File::Spec->catfile( $path, 'auto', 'Tee', PTEE );
-    next unless -r $try_ptee;
-    if ( $try_ptee =~ /\s/ ) {
-        # protect with quotes
-        $try_ptee =~ s{(.*)}{"$1"}ms;
-    }
-    if ( system("$try_ptee -V $to_devnull" ) == 0 ) {
-        $ptee_cmd = $try_ptee;
-        last;
-    }
-    if ( system("$perl $try_ptee -V $to_devnull") == 0 ) {
-        $ptee_cmd = "$perl $try_ptee";
-        last;
-    }
-}
+#my $p = Probe::Perl->new;
+#my $perl = $p->find_perl_interpreter;
+#my $ptee_cmd;
+#my $to_devnull = " > " . File::Spec->devnull . " 2>&1";
+#
+## On installation, we store a copy of ptee in auto/Tee so we're sure
+## to find it later without worrying about $ENV{PATH}
+#
+#for my $path ( @INC ) {
+#    my $try_ptee = File::Spec->catfile( $path, 'auto', 'Tee', PTEE );
+#    next unless -r $try_ptee;
+#    if ( $try_ptee =~ /\s/ ) {
+#        # protect with quotes
+#        $try_ptee =~ s{(.*)}{"$1"}ms;
+#    }
+#    if ( system("$try_ptee -V $to_devnull" ) == 0 ) {
+#        $ptee_cmd = $try_ptee;
+#        last;
+#    }
+#    if ( system("$perl $try_ptee -V $to_devnull") == 0 ) {
+#        $ptee_cmd = "$perl $try_ptee";
+#        last;
+#    }
+#}
 
 #--------------------------------------------------------------------------#
 # Functions
@@ -74,12 +74,13 @@ sub tee {
         }
     }
     
-    my $exit = close COMMAND_FH; # to get $?
+    close COMMAND_FH; # to get $?
     my $status = $?;
+    my $exit = $status ? 0 : 1; 
     
     close for @files;
 
-    return ($exit, $status)
+    return wantarray ? ($exit, $status) : $exit;
 }
 
 1; # modules must be true

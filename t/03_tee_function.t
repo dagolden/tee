@@ -2,7 +2,8 @@
 use strict;
 use File::Spec;
 use File::Temp;
-use IPC::Run3;
+use IO::CaptureOutput qw/ capture qxx /;
+use IO::File;
 use Probe::Perl;
 use Test::More;
 use t::Expected;
@@ -28,13 +29,23 @@ my $tee = File::Spec->catfile(qw/scripts ptee/);
 my $tempfh = File::Temp->new;
 my $tempfh2 = File::Temp->new;
 my $tempname = $tempfh->filename;
-my ($got_stdout, $got_stderr, $rc, $status);
+my $tempname2 = $tempfh2->filename;
+my ($got_stdout, $got_stderr, $teed_stdout, $rc, $status);
+
+my $stdout_regex = quotemeta(expected("STDOUT"));
+my $stderr_regex = quotemeta(expected("STDERR"));
+
+sub _slurp {
+  my $fh = IO::File->new(shift, "r");
+  local $/;
+  return scalar <$fh>;
+}
 
 #--------------------------------------------------------------------------#
 # Begin test plan
 #--------------------------------------------------------------------------#
 
-plan tests =>  14 ;
+plan tests =>  18 ;
 
 require_ok( "Tee" );
 Tee->import;
@@ -47,79 +58,101 @@ ok( -r $hello,
 
 # check direct output of helloworld
 
-run3 "$perl $hello", undef, \$got_stdout, \$got_stderr;
+($got_stdout, $got_stderr) = qxx("$perl $hello");
 
 is( $got_stdout, expected("STDOUT"), 
-    "hello world program output (direct)"
+    "system(CMD) script STDOUT"
+);
+is( $got_stderr, expected("STDERR"), 
+    "system(CMD) script STDERR"
 );
 
 # check tee of STDOUT
 truncate $tempfh, 0;
-$rc = tee("$perl $hello", $tempname);
+
+capture { 
+  $rc = tee("$perl $hello", $tempname) 
+} \$got_stdout, \$got_stderr;
+
 $status = $? >> 8;
 
+
 is( $rc, 1,
-    "tee returns 1 on successful execution"
+    "tee(CMD,FILE) returns 1 on successful execution"
 );
 
 is( $status, 0,
-    "\$? >> 8 is 0 on successful execution"
+    "tee(CMD,FILE) \$? >> 8 is 0 on successful execution"
 );
 
-open FH, "< $tempname";
-$got_stdout = do { local $/; <FH> };
-close FH;
-
 is( $got_stdout, expected("STDOUT"), 
-    "hello world program output (tee file)"
+    "tee(CMD,FILE) script STDOUT"
+);
+is( $got_stderr, expected("STDERR"), 
+    "tee(CMD,FILE) script STDERR"
+);
+
+$teed_stdout = _slurp($tempname);
+is( $teed_stdout, expected("STDOUT"), 
+    "tee(CMD,FILE) script tee file"
 );
 
 # check tee of STDOUT to multiple files
 truncate $tempfh, 0;
-tee("$perl $hello", $tempname, $tempfh2);
+capture { 
+  tee("$perl $hello", $tempname, $tempname2);
+} \$got_stdout, \$got_stderr;
 
-open FH, "< $tempname";
-$got_stdout = do { local $/; <FH> };
-close FH;
 
-is( $got_stdout, expected("STDOUT"), 
-    "hello world program output (tee file1 file2 [1])"
+$teed_stdout = _slurp($tempname);
+is( $teed_stdout, expected("STDOUT"), 
+    "tee(CMD,FILE1,FILE2) script tee file (1)"
 );
 
-open FH, "< $tempfh2";
-$got_stdout = do { local $/; <FH> };
-close FH;
-
-is( $got_stdout, expected("STDOUT"), 
-    "hello world program output (tee file1 file2 [2])"
+$teed_stdout = _slurp($tempname2);
+is( $teed_stdout, expected("STDOUT"), 
+    "tee(CMD,FILE1,FILE2) script tee file (2)"
 );
 
-# check tee of both STDOUT and STDERR
+## check tee of both STDOUT and STDERR
 truncate $tempfh, 0;
-tee("$perl $hello", { stderr => 1 }, $tempname);
+capture { 
+  tee("$perl $hello", { stderr => 1 }, $tempname);
+} \$got_stdout, \$got_stderr;
 
-open FH, "< $tempname";
-$got_stdout = do { local $/; <FH> };
-close FH;
+$teed_stdout = _slurp($tempname);
 
-is( $got_stdout, expected("STDOUT") . expected("STDERR"), 
-    "hello world program output (tee file with stderr)"
+like( $teed_stdout, "/$stdout_regex/", 
+    "tee(CMD,FILE) w/stderr script tee file (STDOUT)"
+);
+like( $teed_stdout, "/$stderr_regex/",
+    "tee(CMD,FILE) w/stderr script tee file (STDERR)"
 );
 
-# check tee of both with append
-tee("$perl $hello", { stderr => 1, append => 1 }, $tempname);
 
-open FH, "< $tempname";
-$got_stdout = do { local $/; <FH> };
-close FH;
+## check tee of both with append
+capture { 
+  tee("$perl $hello", { stderr => 1, append => 1 }, $tempname);
+} \$got_stdout, \$got_stderr;
 
-is( $got_stdout, (expected("STDOUT") . expected("STDERR")) x 2, 
-    "hello world program output (tee file with stderr and append)"
+$teed_stdout = _slurp($tempname);
+
+my $saw_stdout = () = ( $teed_stdout =~ /($stdout_regex)/gms );
+my $saw_stderr = () = ( $teed_stdout =~ /($stderr_regex)/gms );
+
+is( $saw_stdout, 2, 
+    "tee(CMD,FILE) w/stderr+append script tee file (STDOUT)"
+);
+is( $saw_stderr, 2, 
+    "tee(CMD,FILE) w/stderr+append script tee file (STDERR)"
 );
 
-# check tee with fatal error code
+## check tee with fatal error code
 truncate $tempfh, 0;
-$rc = tee("$perl $fatality", { stderr => 1 }, $tempname);
+capture { 
+  $rc = tee("$perl $fatality", { stderr => 1 }, $tempname);
+} \$got_stdout, \$got_stderr;
+
 $status = $? >> 8;
 
 is( $rc, 0,
@@ -127,14 +160,7 @@ is( $rc, 0,
 );
 
 is( $status, 1,
-    "\$? >> 8 is 1 on successful execution"
+    "\$? >> 8 is 1 on fatal execution"
 );
 
-open FH, "< $tempname";
-$got_stdout = do { local $/; <FH> };
-close FH;
-
-is( $got_stdout, expected("STDOUT") . expected("STDERR"), 
-    "hello world program output (tee file with stderr)"
-);
 
