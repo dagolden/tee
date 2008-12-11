@@ -1,8 +1,10 @@
 Revision history for Perl module Tee
 
-0.13_51
+0.13_51 Thu Dec 11 00:48:32 EST 2008
 
-    - moved guts of ptee to Tee::App; removed ptee seach logic from Tee.pm
+    - moved guts of ptee to Tee::App; removed ptee search logic from Tee.pm
+
+    - bumped some prerequisites; dropped others
 
     - changed to the Apache License, version 2.0; (it's clearer, relicensable,
       and is explicit about contributions)
