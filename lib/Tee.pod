@@ -8,7 +8,7 @@ Tee - Pure Perl emulation of GNU tee
 
 =head1 VERSION
 
-This documentation describes version 0.13_51.
+This documentation refers to version 0.13_51
 
 =head1 SYNOPSIS
 
@@ -21,15 +21,17 @@ This documentation describes version 0.13_51.
 
 =head1 DESCRIPTION
 
-The C<<< Tee >>> distribution provides a pure Perl emulation of the standard GNU tool
-C<<< tee >>>.  It is designed to be a platform-independent replacement for operating
-systems without a native C<<< tee >>> program.  As with C<<< tee >>>, it passes input
-received on STDIN through to STDOUT while also writing a copy of the input to
-one or more files.  By default, files will be overwritten.
+The C<<< Tee >>> distribution provides the L<ptee> program, a pure Perl emulation of
+the standard GNU tool C<<< tee >>>.  It is designed to be a platform-independent
+replacement for operating systems without a native C<<< tee >>> program.  As with
+C<<< tee >>>, it passes input received on STDIN through to STDOUT while also writing a
+copy of the input to one or more files.  By default, files will be overwritten.
 
-In addition to this module, the distribution also provides the L<ptee> program
-for a command line replacement for C<<< tee >>>.  Unlike C<<< tee >>>, C<<< ptee >>> does not
-support ignoring interrupts, as signal handling is not sufficiently portable.
+Unlike C<<< tee >>>, C<<< ptee >>> does not support ignoring interrupts, as signal handling
+is not sufficiently portable.
+
+The C<<< Tee >>> module provides a convenience function that may be used in place of
+C<<< system() >>> to redirect commands through C<<< ptee >>>. 
 
 =head1 USAGE
 
@@ -38,10 +40,11 @@ support ignoring interrupts, as signal handling is not sufficiently portable.
    tee( $command, @filenames );
    tee( $command, \%options, @filenames );
 
-Executes the given command, teeing output to STDOUT and a list of files.
-Unlike with C<<< system() >>>, the command must be a string as the command shell is
-used for redirection and piping.  It returns true if the command has an exit
-status of zero and false otherwise.  The exit status is preserved in C<<< $? >>>.
+Executes the given command via C<<< system() >>>, but pipes it through L<ptee> to copy
+output to the list of files.  Unlike with C<<< system() >>>, the command must be a
+string as the command shell is used for redirection and piping.  The return
+value of C<<< system() >>> is passed through, but reflects the success of 
+the C<<< ptee >>> command, which isn't very useful.
 
 The second argument may be a hash-reference of options.  Recognized options
 include:
@@ -67,15 +70,6 @@ portable alternative for capturing these streams from a command separately is
 L<IPC::Run3>, though it does not allow passing it through to a terminal at the
 same time.
 
-=head1 BUGS
-
-Please report any bugs or feature using the CPAN Request Tracker.  
-Bugs can be submitted through the web interface at 
-L<http://rt.cpan.org/Dist/Display.html?Queue=Tee>
-
-When submitting a bug or request, please include a test-file or a patch to an
-existing test-file that illustrates the bug or desired feature.
-
 =head1 SEE ALSO
 
 =over
@@ -93,6 +87,15 @@ IPC::Run3
 IO::Tee
 
 =back
+
+=head1 BUGS
+
+Please report any bugs or feature using the CPAN Request Tracker.  
+Bugs can be submitted through the web interface at 
+L<http://rt.cpan.org/Dist/Display.html?Queue=Tee>
+
+When submitting a bug or request, please include a test-file or a patch to an
+existing test-file that illustrates the bug or desired feature.
 
 =head1 AUTHOR
 

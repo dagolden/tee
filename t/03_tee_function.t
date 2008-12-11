@@ -45,7 +45,7 @@ sub _slurp {
 # Begin test plan
 #--------------------------------------------------------------------------#
 
-plan tests =>  18 ;
+plan tests =>  14 ;
 
 require_ok( "Tee" );
 Tee->import;
@@ -73,17 +73,6 @@ truncate $tempfh, 0;
 capture { 
   $rc = tee("$perl $hello", $tempname) 
 } \$got_stdout, \$got_stderr;
-
-$status = $? >> 8;
-
-
-is( $rc, 1,
-    "tee(CMD,FILE) returns 1 on successful execution"
-);
-
-is( $status, 0,
-    "tee(CMD,FILE) \$? >> 8 is 0 on successful execution"
-);
 
 is( $got_stdout, expected("STDOUT"), 
     "tee(CMD,FILE) script STDOUT"
@@ -146,21 +135,4 @@ is( $saw_stdout, 2,
 is( $saw_stderr, 2, 
     "tee(CMD,FILE) w/stderr+append script tee file (STDERR)"
 );
-
-## check tee with fatal error code
-truncate $tempfh, 0;
-capture { 
-  $rc = tee("$perl $fatality", { stderr => 1 }, $tempname);
-} \$got_stdout, \$got_stderr;
-
-$status = $? >> 8;
-
-is( $rc, 0,
-    "teeing fatal script returns 0"
-);
-
-is( $status, 1,
-    "\$? >> 8 is 1 on fatal execution"
-);
-
 

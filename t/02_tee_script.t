@@ -2,7 +2,8 @@
 use strict;
 use File::Spec;
 use File::Temp;
-use IPC::Run3;
+use IO::CaptureOutput qw/ capture qxx /;
+use IO::File;
 use Probe::Perl;
 use Test::More;
 use t::Expected;
@@ -17,87 +18,111 @@ select($stdout);
 $|=1;
 
 #--------------------------------------------------------------------------#
+# Declarations
+#--------------------------------------------------------------------------#
 
-plan tests =>  9 ;
-
-my $perl = Probe::Perl->find_perl_interpreter;
+my $pp = Probe::Perl->new;
+my $perl = $pp->find_perl_interpreter;
 my $hello = File::Spec->catfile(qw/t helloworld.pl/);
-my $tee = File::Spec->catfile(qw/scripts ptee/);
+my $tee = File::Spec->catfile(qw/bin ptee/);
 my $tempfh = File::Temp->new;
+my $tempfh2 = File::Temp->new;
 my $tempname = $tempfh->filename;
-my ($got_stdout, $got_stderr);
+my $tempname2 = $tempfh2->filename;
+my ($got_stdout, $got_stderr, $teed_stdout);
+
+my $stdout_regex = quotemeta(expected("STDOUT"));
+my $stderr_regex = quotemeta(expected("STDERR"));
+
+sub _slurp {
+  my $fh = IO::File->new(shift, "r");
+  local $/;
+  return scalar <$fh>;
+}
+
+#--------------------------------------------------------------------------#
+# Begin test plan
+#--------------------------------------------------------------------------#
+
+plan tests =>  14 ;
+
+require_ok( "Tee" );
+Tee->import;
+
+can_ok( "main", "tee" );
 
 ok( -r $hello, 
     "hello script readable" 
 );
 
-ok( -r $tee, 
-    "tee script readable" 
+# check direct output of helloworld
+
+($got_stdout, $got_stderr) = qxx("$perl $hello");
+
+is( $got_stdout, expected("STDOUT"), 
+    "system(CMD) script STDOUT"
+);
+is( $got_stderr, expected("STDERR"), 
+    "system(CMD) script STDERR"
 );
 
-# check direct output of hello world
-run3 "$perl $hello", undef, \$got_stdout, \$got_stderr;
-
-is( $got_stdout, expected("STDOUT"),
-    "hello world program output (direct)"
-);
-
-# check output through ptee
+# check tee of STDOUT
 truncate $tempfh, 0;
-run3 "$perl $hello | $perl $tee $tempname", undef, \$got_stdout, \$got_stderr;
 
-is( $got_stdout, expected("STDOUT"),
-    "hello world program output (tee stdout)"
+($got_stdout, $got_stderr) = qxx("$perl $hello | $perl $tee $tempname");
+
+is( $got_stdout, expected("STDOUT"), 
+    "tee(CMD,FILE) script STDOUT"
+);
+is( $got_stderr, expected("STDERR"), 
+    "tee(CMD,FILE) script STDERR"
 );
 
-open FH, "< $tempname";
-$got_stdout = do { local $/; <FH> };
-close FH;
-
-is( $got_stdout, expected("STDOUT"),
-    "hello world program output (tee file)"
+$teed_stdout = _slurp($tempname);
+is( $teed_stdout, expected("STDOUT"), 
+    "tee(CMD,FILE) script tee file"
 );
 
-# check appended output
-run3 "$perl $hello | $perl $tee -a $tempname", undef, \$got_stdout, \$got_stderr;
-
-open FH, "< $tempname";
-$got_stdout = do { local $/; <FH> };
-close FH;
-
-is( $got_stdout, expected("STDOUT") x 2,
-    "hello world program output (tee -a)"
-);
-
-run3 "$perl $hello | $perl $tee --append $tempname", undef, \$got_stdout, \$got_stderr;
-
-open FH, "< $tempname" or die "Can't open $tempname for reading";
-
-$got_stdout = do { local $/; <FH> };
-close FH;
-
-is( $got_stdout, expected("STDOUT") x 3,
-    "hello world program output (tee --append)"
-);
-
-# check multiple files
-my $temp2 = File::Temp->new;
+## check tee of STDOUT to multiple files
 truncate $tempfh, 0;
-run3 "$perl $hello | $perl $tee $tempname $temp2", undef, \$got_stdout, \$got_stderr;
+($got_stdout, $got_stderr) = qxx("$perl $hello | $perl $tee $tempname $tempname2");
 
-open FH, "< $tempname";
-$got_stdout = do { local $/; <FH> };
-close FH;
-
-is( $got_stdout, expected("STDOUT"),
-    "hello world program output (tee file1 file2 [1])"
+$teed_stdout = _slurp($tempname);
+is( $teed_stdout, expected("STDOUT"), 
+    "tee(CMD,FILE1,FILE2) script tee file (1)"
 );
 
-open FH, "< $temp2";
-$got_stdout = do { local $/; <FH> };
-close FH;
+$teed_stdout = _slurp($tempname2);
+is( $teed_stdout, expected("STDOUT"), 
+    "tee(CMD,FILE1,FILE2) script tee file (2)"
+);
 
-is( $got_stdout, expected("STDOUT"),
-    "hello world program output (tee file1 file2 [2])"
+### check tee of both STDOUT and STDERR
+truncate $tempfh, 0;
+($got_stdout, $got_stderr) = qxx("$perl $hello 2>&1 | $perl $tee $tempname" );
+  
+$teed_stdout = _slurp($tempname);
+
+like( $teed_stdout, "/$stdout_regex/", 
+    "tee(CMD,FILE) w/stderr script tee file (STDOUT)"
+);
+like( $teed_stdout, "/$stderr_regex/",
+    "tee(CMD,FILE) w/stderr script tee file (STDERR)"
+);
+
+
+### check tee of both with append
+($got_stdout, $got_stderr) = qxx("$perl $hello 2>&1 | $perl -- $tee --append $tempname" );
+
+$teed_stdout = _slurp($tempname);
+
+my $saw_stdout = () = ( $teed_stdout =~ /($stdout_regex)/gms );
+my $saw_stderr = () = ( $teed_stdout =~ /($stderr_regex)/gms );
+
+is( $saw_stdout, 2, 
+    "tee(CMD,FILE) w/stderr+append script tee file (STDOUT)"
+);
+is( $saw_stderr, 2, 
+    "tee(CMD,FILE) w/stderr+append script tee file (STDERR)"
 );
 

@@ -4,15 +4,18 @@ Changes
 inc/Module/Build/WikiDoc.pm
 INSTALL
 lib/Tee.pm
+lib/Tee.pod
+lib/Tee/App.pm
+lib/Tee/App.pod
 LICENSE
+Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.yml
 README
 t/01_Tee.t
 t/02_tee_script.t
 t/03_tee_function.t
-t/98_pod.t
-t/99_pod-coverage.t
 t/Expected.pm
 t/fatality.pl
 t/helloworld.pl
@@ -23,6 +26,3 @@ xt/pod-coverage.t
 xt/pod-format.t
 xt/spelling.t
 xt/stopwords.txt
-lib/Tee.pod
-Makefile.PL
-META.yml

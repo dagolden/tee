@@ -1,57 +1,43 @@
-# Copyright (c) 2008 by David Golden. All rights reserved.
-# Licensed under Apache License, Version 2.0 (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License was distributed with this file or you may obtain a 
-# copy of the License from http://www.apache.org/licenses/LICENSE-2.0
-
 package Tee;
-use strict;
 
 $Tee::VERSION     = '0.13_51';
 $Tee::VERSION     = eval $Tee::VERSION; ## no critic
 @Tee::ISA         = qw (Exporter);
 @Tee::EXPORT      = qw (tee);
 
+use strict;
 use Exporter ();
-use IO::File;
+use Probe::Perl;
+# use warnings; # only for Perl >= 5.6
+
+
+#--------------------------------------------------------------------------#
+# Platform independent ptee invocation
+#--------------------------------------------------------------------------#
+
+my $perl = Probe::Perl->find_perl_interpreter;
+my $ptee_cmd = "$perl -MTee::App -e run --";
+
+#--------------------------------------------------------------------------#
+# Functions
+#--------------------------------------------------------------------------#
 
 sub tee {
     my $command = shift;
     my $options;
     $options = shift if (ref $_[0] eq 'HASH');
-
-    my $mode = $options->{append} ? ">>" : ">";
+    my $files = join(" ", @_);
     my $redirect = $options->{stderr} ? " 2>&1 " : q{};
-
-    my @files;
-    for my $file ( @_ ) {
-        my $f = IO::File->new("$mode $file") 
-            or die "Could't open '$file' for writing: $!'";
-        push @files, $f;
-    }
-
-    local *COMMAND_FH;
-    open COMMAND_FH, "$command $redirect |" or die;
-    my $buffer;
-    my $buffer_size = 1024;
-    while ( sysread( COMMAND_FH, $buffer, $buffer_size ) > 0 ) {
-        for my $fh ( *STDOUT, @files ) {
-            syswrite $fh, $buffer;
-        }
-    }
-    
-    close COMMAND_FH; # to get $?
-    my $status = $?;
-    my $exit = $status ? 0 : 1; 
-    
-    close for @files;
-
-    return wantarray ? ($exit, $status) : $exit;
+    my $append = $options->{append} ? " -a " : q{};
+    system( "$command $redirect | $ptee_cmd $append $files" );
 }
 
-1;
+1; # modules must be true
 
 __END__
+#--------------------------------------------------------------------------#
+# main pod documentation 
+#--------------------------------------------------------------------------#
 
 =begin wikidoc
 
@@ -61,7 +47,7 @@ Tee - Pure Perl emulation of GNU tee
 
 = VERSION
 
-This documentation describes version %%VERSION%%.
+This documentation refers to version %%VERSION%%
 
 = SYNOPSIS
 
@@ -74,15 +60,17 @@ This documentation describes version %%VERSION%%.
 
 = DESCRIPTION
 
-The {Tee} distribution provides a pure Perl emulation of the standard GNU tool
-{tee}.  It is designed to be a platform-independent replacement for operating
-systems without a native {tee} program.  As with {tee}, it passes input
-received on STDIN through to STDOUT while also writing a copy of the input to
-one or more files.  By default, files will be overwritten.
+The {Tee} distribution provides the [ptee] program, a pure Perl emulation of
+the standard GNU tool {tee}.  It is designed to be a platform-independent
+replacement for operating systems without a native {tee} program.  As with
+{tee}, it passes input received on STDIN through to STDOUT while also writing a
+copy of the input to one or more files.  By default, files will be overwritten.
 
-In addition to this module, the distribution also provides the [ptee] program
-for a command line replacement for {tee}.  Unlike {tee}, {ptee} does not
-support ignoring interrupts, as signal handling is not sufficiently portable.
+Unlike {tee}, {ptee} does not support ignoring interrupts, as signal handling
+is not sufficiently portable.
+
+The {Tee} module provides a convenience function that may be used in place of
+{system()} to redirect commands through {ptee}. 
 
 = USAGE
 
@@ -91,10 +79,11 @@ support ignoring interrupts, as signal handling is not sufficiently portable.
   tee( $command, @filenames );
   tee( $command, \%options, @filenames );
 
-Executes the given command, teeing output to STDOUT and a list of files.
-Unlike with {system()}, the command must be a string as the command shell is
-used for redirection and piping.  It returns true if the command has an exit
-status of zero and false otherwise.  The exit status is preserved in {$?}.
+Executes the given command via {system()}, but pipes it through [ptee] to copy
+output to the list of files.  Unlike with {system()}, the command must be a
+string as the command shell is used for redirection and piping.  The return
+value of {system()} is passed through, but reflects the success of 
+the {ptee} command, which isn't very useful.
 
 The second argument may be a hash-reference of options.  Recognized options
 include:
@@ -111,6 +100,12 @@ portable alternative for capturing these streams from a command separately is
 [IPC::Run3], though it does not allow passing it through to a terminal at the
 same time.
 
+= SEE ALSO
+
+* [ptee]
+* IPC::Run3
+* IO::Tee
+
 = BUGS
 
 Please report any bugs or feature using the CPAN Request Tracker.  
@@ -119,12 +114,6 @@ Bugs can be submitted through the web interface at
 
 When submitting a bug or request, please include a test-file or a patch to an
 existing test-file that illustrates the bug or desired feature.
-
-= SEE ALSO
-
-* [ptee]
-* IPC::Run3
-* IO::Tee
 
 = AUTHOR
 
@@ -152,4 +141,3 @@ limitations under the License.
 =end wikidoc
 
 =cut
-
