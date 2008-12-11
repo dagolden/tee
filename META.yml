@@ -2,18 +2,15 @@
 name: Tee
 version: 0.13_51
 author:
-  - 'David A. Golden <dagolden@cpan.org>'
+  - 'David Golden <dagolden@cpan.org>'
 abstract: Pure Perl emulation of GNU tee
-license: perl
+license: apache
 resources:
-  license: http://dev.perl.org/licenses/
+  license: http://apache.org/licenses/LICENSE-2.0
 requires:
-  File::Basename: 0
-  File::Spec: 0
-  Getopt::Long: 2.32
-  IPC::Run3: 0.033
-  Probe::Perl: 0
-  Test::More: 0.45
+  perl: 5.006
+build_requires:
+  Test::More: 0.47
 provides:
   Tee:
     file: lib/Tee.pm
@@ -22,3 +19,8 @@ generated_by: Module::Build version 0.3
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2
+no_index:
+  directory:
+    - examples
+    - inc
+    - t

@@ -2,7 +2,7 @@ NAME
     Tee - Pure Perl emulation of GNU tee
 
 VERSION
-    This documentation refers to version 0.13
+    This documentation describes version 0.13_51.
 
 SYNOPSIS
       # from Perl
@@ -13,29 +13,28 @@ SYNOPSIS
       $ cat README.txt | ptee COPY.txt
 
 DESCRIPTION
-    The "Tee" distribution provides the ptee program, a pure Perl emulation
-    of the standard GNU tool "tee". It is designed to be a
-    platform-independent replacement for operating systems without a native
-    "tee" program. As with "tee", it passes input received on STDIN through
-    to STDOUT while also writing a copy of the input to one or more files.
-    By default, files will be overwritten.
+    The "Tee" distribution provides a pure Perl emulation of the standard
+    GNU tool "tee". It is designed to be a platform-independent replacement
+    for operating systems without a native "tee" program. As with "tee", it
+    passes input received on STDIN through to STDOUT while also writing a
+    copy of the input to one or more files. By default, files will be
+    overwritten.
 
-    Unlike "tee", "ptee" does not support ignoring interrupts, as signal
-    handling is not sufficiently portable.
-
-    The "Tee" module provides a convenience function that may be used in
-    place of "system()" to redirect commands through "ptee".
+    In addition to this module, the distribution also provides the ptee
+    program for a command line replacement for "tee". Unlike "tee", "ptee"
+    does not support ignoring interrupts, as signal handling is not
+    sufficiently portable.
 
 USAGE
   "tee()"
        tee( $command, @filenames );
        tee( $command, \%options, @filenames );
 
-    Executes the given command via "system()", but pipes it through ptee to
-    copy output to the list of files. Unlike with "system()", the command
-    must be a string as the command shell is used for redirection and
-    piping. The return value of "system()" is passed through, but reflects
-    the success of the "ptee" command, which isn't very useful.
+    Executes the given command, teeing output to STDOUT and a list of files.
+    Unlike with "system()", the command must be a string as the command
+    shell is used for redirection and piping. It returns true if the command
+    has an exit status of zero and false otherwise. The exit status is
+    preserved in $?.
 
     The second argument may be a hash-reference of options. Recognized
     options include:
@@ -53,6 +52,14 @@ LIMITATIONS
     a command separately is IPC::Run3, though it does not allow passing it
     through to a terminal at the same time.
 
+BUGS
+    Please report any bugs or feature using the CPAN Request Tracker. Bugs
+    can be submitted through the web interface at
+    <http://rt.cpan.org/Dist/Display.html?Queue=Tee>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 SEE ALSO
     *   ptee
 
@@ -60,49 +67,24 @@ SEE ALSO
 
     *   IO::Tee
 
-BUGS
-    Please report any bugs or feature using the CPAN Request Tracker. Bugs
-    can be submitted by email to "bug-Tee@rt.cpan.org" or through the web
-    interface at <http://rt.cpan.org/Public/Dist/Display.html?Name=Tee>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 AUTHOR
     David A. Golden (DAGOLDEN)
 
-    dagolden@cpan.org
-
-    http://www.dagolden.org/
-
 COPYRIGHT AND LICENSE
-    Copyright (c) 2006 by David A. Golden
+    Copyright (c) 2006-2008 by David A. Golden. All rights reserved.
 
-    This program is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
+    Licensed under Apache License, Version 2.0 (the "License"). You may not
+    use this file except in compliance with the License. A copy of the
+    License was distributed with this file or you may obtain a copy of the
+    License from http://www.apache.org/licenses/LICENSE-2.0
 
-    The full text of the license can be found in the LICENSE file included
-    with this module.
+    Files produced as output though the use of this software, shall not be
+    considered Derivative Works, but shall be considered the original work
+    of the Licensor.
 
-DISCLAIMER OF WARRANTY
-    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-    NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
-    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
-    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
-    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
-    DAMAGES.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 

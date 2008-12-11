@@ -4,6 +4,12 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://www.apache.org/licenses/LICENSE-2.0
 
-- Write some code
-- Write some tests
-- Replace boilerplate docs with real documentation
+use strict;
+use warnings;
+use File::Spec;
+use Test::More;
+require Test::Perl::Critic;
+
+my $rcfile = File::Spec->catfile( 'xt', 'perlcriticrc' );
+Test::Perl::Critic->import( -profile => $rcfile );
+all_critic_ok( 'lib', 'examples'  );
