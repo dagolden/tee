@@ -10,12 +10,12 @@ WriteMakefile
                          ],
           'VERSION_FROM' => 'lib/Tee.pm',
           'PREREQ_PM' => {
-                           'Getopt::Long' => '2.37',
+                           'Getopt::Long' => '2.2',
                            'IO::File' => 0,
-                           'IO::CaptureOutput' => '1.1',
-                           'File::Spec' => '3.2701',
+                           'IO::CaptureOutput' => '1.09',
+                           'File::Spec' => '3.27',
                            'Exporter' => 0,
-                           'Test::More' => '0.62',
+                           'Test::More' => '0.47',
                            'Probe::Perl' => '0.01',
                            'File::Temp' => '0.2',
                            'File::Basename' => 0

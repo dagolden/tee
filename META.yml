@@ -10,15 +10,14 @@ resources:
 requires:
   Exporter: 0
   File::Basename: 0
-  Getopt::Long: 2.37
+  Getopt::Long: 2.2
   IO::File: 0
   Probe::Perl: 0.01
-  perl: 0
 build_requires:
-  File::Spec: 3.2701
+  File::Spec: 3.27
   File::Temp: 0.2
-  IO::CaptureOutput: 1.1
-  Test::More: 0.62
+  IO::CaptureOutput: 1.09
+  Test::More: 0.47
 provides:
   Tee:
     file: lib/Tee.pm
