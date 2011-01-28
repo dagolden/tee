@@ -1,5 +1,11 @@
 Revision history for Perl module Tee
 
+{{$NEXT}}
+
+    [OTHER]
+
+    - converted distribution to Dist::Zilla
+
 0.13_51 Thu Dec 11 00:48:32 EST 2008
 
     - moved guts of ptee to Tee::App; removed ptee search logic from Tee.pm

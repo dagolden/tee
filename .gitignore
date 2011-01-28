@@ -7,3 +7,5 @@
 /Makefile.old
 /cover_db/*
 *.patch
+/.build
+/Tee-*
