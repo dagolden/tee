@@ -66,8 +66,7 @@ sub run {
   # Setup list of filehandles
   #--------------------------------------------------------------------------#
 
-  my $stdout = IO::Handle->new->fdopen(fileno(STDOUT),"w");
-  my @files = $stdout;
+  my @files;
 
   for my $file ( @ARGV ) {
       my $f = IO::File->new("$mode $file") 
@@ -83,6 +82,7 @@ sub run {
   my $buffer;
 
   while ( sysread( STDIN, $buffer, $buffer_size ) > 0 ) {
+      syswrite STDOUT, $buffer;
       for my $fh ( @files ) {
           syswrite $fh, $buffer;
       }
@@ -93,6 +93,8 @@ sub run {
 1;
 
 __END__
+
+=for Pod::Coverage run
 
 =begin wikidoc
 

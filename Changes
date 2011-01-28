@@ -2,6 +2,10 @@ Revision history for Perl module Tee
 
 {{$NEXT}}
 
+    [BUG FIXES]
+
+    - fix error writing to undef handle on MSWin32 in some circumstances
+
     [OTHER]
 
     - converted distribution to Dist::Zilla
